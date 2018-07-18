@@ -1107,4 +1107,25 @@ class TestQueryResult < MiniTest::Test
     assert user = response.data.node
     assert_kind_of @client.types::User, user
   end
+
+  def test_client_query_result_contains_query
+    Temp.const_set :Query, @client.parse(<<-'GRAPHQL')
+      query($id: ID!) {
+        node(id: $id) {
+          ... on User {
+            id
+          }
+        }
+      }
+    GRAPHQL
+
+    assert response = @client.query(Temp::Query, variables: { id: "1" }, context: { something: true })
+
+    assert_instance_of GraphQL::Client::Query, response.query
+    assert_instance_of GraphQL::Language::Nodes::Document, response.query.document
+    assert_equal "query TestQueryResult__Temp__Query($id: ID!) {\n  node(id: $id) {\n    __typename\n    ... on User {\n      id\n    }\n  }\n}", response.query.document.to_query_string
+    assert_equal "TestQueryResult__Temp__Query", response.query.operation_name
+    assert_equal({ something: true }, response.query.context)
+    assert_equal({ "id" => "1" }, response.query.variables)
+  end
 end

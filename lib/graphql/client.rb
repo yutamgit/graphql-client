@@ -7,6 +7,7 @@ require "graphql/client/definition_variables"
 require "graphql/client/definition"
 require "graphql/client/error"
 require "graphql/client/errors"
+require "graphql/client/query"
 require "graphql/client/fragment_definition"
 require "graphql/client/operation_definition"
 require "graphql/client/query_typename"
@@ -350,7 +351,8 @@ module GraphQL
         result,
         data: definition.new(data, Errors.new(errors, ["data"])),
         errors: Errors.new(errors),
-        extensions: extensions
+        extensions: extensions,
+        query: Query.new(document: document, operation_name: operation.name, variables: variables, context: context)
       )
     end
 
