@@ -97,7 +97,11 @@ module GraphQL
       @document_tracking_enabled = false
       @allow_dynamic_queries = false
       @enforce_collocated_callers = enforce_collocated_callers
-
+      # This will share cached type masking between parses,
+      # if this version of graphql-ruby supports it
+      if GraphQL::Query.instance_method(:initialize).parameters.any? { |type, name| name == :warden }
+        @shared_warden = GraphQL::Schema::Warden.new(@schema.default_filter, context: {}, schema: @schema)
+      end
       @types = Schema.generate(@schema)
     end
 
@@ -189,7 +193,16 @@ module GraphQL
         GraphQL::StaticValidation::FieldsHaveAppropriateSelections
       ]
       validator = GraphQL::StaticValidation::Validator.new(schema: self.schema, rules: rules)
-      query = GraphQL::Query.new(self.schema, document: document_dependencies)
+
+      query_options = {
+        document: document_dependencies
+      }
+      # Add this option to cache type masking, if this version
+      # of GraphQL-Ruby supports it
+      if @shared_warden
+        query_options[:warden] = @shared_warden
+      end
+      query = GraphQL::Query.new(self.schema, **query_options)
 
       errors = validator.validate(query)
       errors.fetch(:errors).each do |error|
