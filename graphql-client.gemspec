@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 Gem::Specification.new do |s|
   s.name = "graphql-client"
-  s.version = "0.17.0"
+  s.version = "1.0.0"
   s.summary = "GraphQL Client"
   s.description = "A Ruby library for declaring, composing and executing GraphQL queries"
   s.homepage = "https://github.com/github/graphql-client"
@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.files = Dir["README.md", "LICENSE", "lib/**/*.rb"]
 
   s.add_dependency "activesupport", ">= 3.0"
-  s.add_dependency "graphql", "~> 1.10"
+  s.add_dependency "graphql", "~> 2.0.0"
 
   s.add_development_dependency "actionpack", ">= 3.2.22"
   s.add_development_dependency "erubi", "~> 1.6"
